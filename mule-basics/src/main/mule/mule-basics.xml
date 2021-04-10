@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:java="http://www.mulesoft.org/schema/mule/java" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/java http://www.mulesoft.org/schema/mule/java/current/mule-java.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="5c0d0bdf-9f83-49af-9126-4e2951bc0896" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<flow name="mule-basicsFlow" doc:id="7a39a28c-a6d6-4df5-888d-e32b99bd3491" >
+		<http:listener doc:name="Listener" doc:id="618f037a-c7f4-4cb8-b2af-106140656e9f" config-ref="HTTP_Listener_config" path="/helllo"/>
+		<set-variable value="#[message.attributes.queryParams.userName]" doc:name="Set Variable" doc:id="ddbd0250-f4d5-4729-9d66-32806e66fcf1" variableName="user"/>
+		<set-payload value="#['Hello : ' ++ message.attributes.queryParams.userName]" doc:name="Set Payload" doc:id="3a95682a-4735-463a-a360-78b8b3c608bb" mimeType="text/plain"/>
+		<logger level="INFO" doc:name="Logger" doc:id="f8ddaf9f-d861-4ea9-bd45-283208058de3" message="#[message.payload ++ ' Set Variable : ' ++ vars.user]"/>
+	</flow>
+	<flow name="mule-basics-flow-invoke-static-method" doc:id="554f4634-268c-4e8c-80c8-785a5446d0a3" >
+		<http:listener doc:name="Listener" doc:id="59bacebb-7c3b-4e96-a868-5af37dde8eb6" config-ref="HTTP_Listener_config" path="/invokeStaticMethodExample" outputMimeType="text/plain"/>
+		<java:invoke-static doc:name="Invoke static" doc:id="ad12032d-a05f-4596-a13f-337ab115be47" class="mule.example.MuleExample" method="invokeStaticExample(java.lang.String)" outputMimeType="text/plain">
+			<java:args ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	name: attributes.queryParams.name as String
+}]]]></java:args>
+		</java:invoke-static>
+		<logger level="INFO" doc:name="Logger" doc:id="a8f0f088-ad79-4afb-8d44-fd1c53e4ae4e" message="#[message.payload]"/>
+	</flow>
+	<flow name="mule-basics-flow-invoke-method" doc:id="9dcc05e5-50ec-4b52-a04d-b0e0b6a1e629" >
+		<http:listener doc:name="Listener" doc:id="9cb791e8-2b1a-43ec-8e79-2edda1d3084c" config-ref="HTTP_Listener_config" path="/invokeNonStaticMethodExample"/>
+		<java:new doc:name="New" doc:id="114c7108-6805-4529-9698-73cdece2b3c8" class="mule.example.MuleExample" constructor="MuleExample()" target="instanceVar"/>
+		<java:invoke method="invokeNonStaticExample(java.lang.String)" doc:name="Invoke" doc:id="756a4859-3f72-4605-86d2-6d085278630c" instance="#[vars.instanceVar]" class="mule.example.MuleExample" outputMimeType="text/plain">
+			<java:args ><![CDATA[#[%dw 2.0
+output application/java
+---
+{
+	name: attributes.queryParams.name as String
+}]]]></java:args>
+		</java:invoke>
+	</flow>
+</mule>
