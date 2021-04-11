@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:wsc="http://www.mulesoft.org/schema/mule/wsc" xmlns:http="http://www.mulesoft.org/schema/mule/http"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
+http://www.mulesoft.org/schema/mule/wsc http://www.mulesoft.org/schema/mule/wsc/current/mule-wsc.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="3ef7d6fe-cbf1-42f1-b843-26c1f6b00a5d" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<wsc:config name="Web_Service_Consumer_Config" doc:name="Web Service Consumer Config" doc:id="c07dbb87-b2e6-44cd-94c4-b32675079d38">
+		<wsc:connection wsdlLocation="http://www.thomas-bayer.com/axis2/services/BLZService?wsdl" service="BLZService" port="BLZServiceSOAP12port_http" address="http://www.thomas-bayer.com/axis2/services/BLZService">
+			<wsc:custom-transport-configuration >
+				<wsc:default-http-transport-configuration timeout="300000" />
+			</wsc:custom-transport-configuration>
+			<wsc:web-service-security actor="http://schemas.xmlsoap.org/soap/actor/next" />
+		</wsc:connection>
+	</wsc:config>
+	<flow name="consuming-soap-servicesFlow" doc:id="db01747c-4c53-4402-a378-46f8cb702272" >
+		<http:listener doc:name="Listener" doc:id="12bcfaf4-9569-4167-aeb5-d8b1e40392c1" config-ref="HTTP_Listener_config" path="/banks"/>
+		<flow-ref doc:name="Flow Reference" doc:id="c6a8dcdf-e108-4ebd-859e-8eaad50fa456" name="call-soap-ws"/>
+	</flow>
+	<flow name="call-soap-ws" doc:id="cc1eb44d-5be6-4a97-ac5d-283c1e50cd0a" >
+		<parse-template doc:name="Parse Template" doc:id="003d20b6-2674-4104-a285-80c416a371ba" location="input-template.xml"/>
+		<wsc:consume operation="getBank" doc:name="Consume" doc:id="ac41acec-0624-424d-b5cf-aeda06a3bbba" config-ref="Web_Service_Consumer_Config"/>
+	</flow>
+</mule>
