@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<mule xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd">
+	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="f47af30f-2883-40b6-ae2a-588940b91c30" >
+		<http:listener-connection host="0.0.0.0" port="8081" />
+	</http:listener-config>
+	<http:request-config name="HTTP_Request_configuration" doc:name="HTTP Request configuration" doc:id="ee7ba5ca-22c7-4f4b-925e-de43dc7c40ff">
+		<http:request-connection host="jsonplaceholder.typicode.com" />
+	</http:request-config>
+	<http:request-config name="HTTP_Request_configuration1" doc:name="HTTP Request configuration" doc:id="12e2deca-8b91-41db-a80f-83a35c39d0c6" >
+		<http:request-connection host="jsonplaceholder.typicode.com" />
+	</http:request-config>
+	<flow name="consuming-rest-todos" doc:id="be342369-07a2-484b-8820-61d1aeea65a9" >
+		<http:request method="GET" doc:name="Request" doc:id="a8811d74-affd-4bf0-81b8-de49587b1f0e" config-ref="HTTP_Request_configuration" path="/todos"/>
+	</flow>
+	<flow name="consuming-rest-servicesFlow" doc:id="6d0b156e-8146-4ac4-8c72-4be9fa3229fd" >
+		<http:listener doc:name="Listener" doc:id="ca20d411-e510-4c08-900d-a9ae241f4f46" config-ref="HTTP_Listener_config" path="/todoapp"/>
+		<choice doc:name="Choice" doc:id="535117ab-e122-4c21-a5e6-c14993ea1aa5" >
+			<when expression="#[message.attributes.queryParams.id == null]">
+				<flow-ref doc:name="Flow Reference" doc:id="7cf517f2-4e4c-488f-b13a-23470fa9d29d" name="consuming-rest-todos" />
+			</when>
+			<when expression="#[message.attributes.queryParams.id != null]">
+				<flow-ref doc:name="Flow Reference" doc:id="59fa0d62-559e-4124-9da8-a2751dca41b5" name="consuming-rest-specific-todo"/>
+			</when>
+			<otherwise >
+				<set-payload value="Invalid Request" doc:name="Set Payload" doc:id="216f9e63-0608-4673-bf0a-4b47ef789e17" />
+			</otherwise>
+		</choice>
+	</flow>
+	<flow name="consuming-rest-specific-todo" doc:id="fc11dcc6-56fe-4d4f-afaa-8319dc857f18" >
+		<set-variable value="#[message.attributes.queryParams.id as String]" doc:name="Set Variable" doc:id="7a5204f9-3a9c-4971-8912-42492e677e78" variableName="toDoId"/>
+		<http:request method="GET" doc:name="Request" doc:id="c67c8bec-9e42-45b8-a5ed-afe93662202a" config-ref="HTTP_Request_configuration" path="/todos/{Id}">
+			<http:uri-params ><![CDATA[#[output application/java
+---
+{
+	Id : vars.toDoId
+}]]]></http:uri-params>
+		</http:request>
+	</flow>
+</mule>
