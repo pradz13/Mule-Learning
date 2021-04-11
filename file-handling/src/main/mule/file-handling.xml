@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:file="http://www.mulesoft.org/schema/mule/file" xmlns="http://www.mulesoft.org/schema/mule/core"
-	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
-http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd">
+<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:file="http://www.mulesoft.org/schema/mule/file"
+	xmlns="http://www.mulesoft.org/schema/mule/core"
+	xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/file/current/mule-file.xsd
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
 	<file:config name="File_Config" doc:name="File Config" doc:id="415e28d1-465f-48d7-af63-184b67572a8b" >
 		<file:connection workingDir="F:\Projects\file_handling" />
 	</file:config>
@@ -13,6 +14,16 @@ http://www.mulesoft.org/schema/mule/file http://www.mulesoft.org/schema/mule/fil
 				<fixed-frequency frequency="10" timeUnit="SECONDS" />
 			</scheduling-strategy>
 		</file:listener>
-		<logger level="INFO" doc:name="Logger" doc:id="36fc342d-d1f2-47b5-8a19-2fd9477c597f" message="#[payload]"/>
+		<ee:transform doc:name="Transform Message" doc:id="b1a9255b-f94e-4c53-afe6-e466a2980e3f" >
+			<ee:message >
+				<ee:set-payload ><![CDATA[%dw 2.0
+output application/java
+---
+payload]]></ee:set-payload>
+			</ee:message>
+		</ee:transform>
+		<foreach doc:name="For Each" doc:id="4c9b2cd6-a98b-4bad-90ef-ba825d79db8b" >
+			<logger level="INFO" doc:name="Logger" doc:id="36fc342d-d1f2-47b5-8a19-2fd9477c597f" message="#[payload]" />
+		</foreach>
 	</flow>
 </mule>
