@@ -10,12 +10,13 @@ http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
 	<db:config name="Database_Config" doc:name="Database Config" doc:id="3984af24-c84d-4c9a-a09d-81e2e86c89bb" >
-		<db:my-sql-connection host="localhost" port="3306" user="root" password="Kolkata@1" database="muletrainingdb" >
+		<db:my-sql-connection host="${db.host}" port="3306" user="${db.username}" password="${db.password}" database="muletrainingdb" >
 			<db:connection-properties >
 				<db:connection-property key="useSSL" value="false" />
 			</db:connection-properties>
 		</db:my-sql-connection>
 	</db:config>
+	<configuration-properties doc:name="Configuration properties" doc:id="466f6a82-0494-4460-a290-6f8dfe074056" file="db-${env}.yaml" />
 	<flow name="datbase-functionalityFlow" doc:id="6e354b94-a413-434e-8643-ace6aa62a7d9" >
 		<http:listener doc:name="Listener" doc:id="530361bc-60e6-4d4c-a4c0-595c8ae25362" config-ref="HTTP_Listener_config" path="/db-func"/>
 		<db:select doc:name="Select" doc:id="7c8a1ff4-e9ae-4be3-a1e2-8bc3e2b1ba65" config-ref="Database_Config">
