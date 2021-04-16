@@ -1,22 +1,26 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<mule xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core" xmlns:db="http://www.mulesoft.org/schema/mule/db"
-	xmlns:http="http://www.mulesoft.org/schema/mule/http"
-	xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
+<mule xmlns:secure-properties="http://www.mulesoft.org/schema/mule/secure-properties" xmlns:ee="http://www.mulesoft.org/schema/mule/ee/core"
+	xmlns:db="http://www.mulesoft.org/schema/mule/db"
+	xmlns:http="http://www.mulesoft.org/schema/mule/http" xmlns="http://www.mulesoft.org/schema/mule/core" xmlns:doc="http://www.mulesoft.org/schema/mule/documentation" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.mulesoft.org/schema/mule/core http://www.mulesoft.org/schema/mule/core/current/mule.xsd
 http://www.mulesoft.org/schema/mule/http http://www.mulesoft.org/schema/mule/http/current/mule-http.xsd
 http://www.mulesoft.org/schema/mule/db http://www.mulesoft.org/schema/mule/db/current/mule-db.xsd
-http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd">
+http://www.mulesoft.org/schema/mule/ee/core http://www.mulesoft.org/schema/mule/ee/core/current/mule-ee.xsd
+http://www.mulesoft.org/schema/mule/secure-properties http://www.mulesoft.org/schema/mule/secure-properties/current/mule-secure-properties.xsd">
 	<http:listener-config name="HTTP_Listener_config" doc:name="HTTP Listener config" doc:id="cc2e6f94-4974-4db5-ae8a-11c019f5e2e3" >
 		<http:listener-connection host="0.0.0.0" port="8081" />
 	</http:listener-config>
 	<db:config name="Database_Config" doc:name="Database Config" doc:id="3984af24-c84d-4c9a-a09d-81e2e86c89bb" >
-		<db:my-sql-connection host="${db.host}" port="3306" user="${db.username}" password="${db.password}" database="muletrainingdb" >
+		<db:my-sql-connection host="${secure::db.host}" port="3306" user="${secure::db.username}" password="${secure::db.password}" database="muletrainingdb" >
 			<db:connection-properties >
 				<db:connection-property key="useSSL" value="false" />
 			</db:connection-properties>
 		</db:my-sql-connection>
 	</db:config>
 	<configuration-properties doc:name="Configuration properties" doc:id="466f6a82-0494-4460-a290-6f8dfe074056" file="db-${env}.yaml" />
+	<secure-properties:config name="db-secure-devSecure_Properties_Config" doc:name="Secure Properties Config" doc:id="a5026852-7bf7-4d59-9d23-81d7c2d10134" file="db-secure-dev.yaml" key="abcdefghijklmnop" >
+		<secure-properties:encrypt algorithm="Blowfish" />
+	</secure-properties:config>
 	<flow name="datbase-functionalityFlow" doc:id="6e354b94-a413-434e-8643-ace6aa62a7d9" >
 		<http:listener doc:name="Listener" doc:id="530361bc-60e6-4d4c-a4c0-595c8ae25362" config-ref="HTTP_Listener_config" path="/db-func"/>
 		<db:select doc:name="Select" doc:id="7c8a1ff4-e9ae-4be3-a1e2-8bc3e2b1ba65" config-ref="Database_Config">
